@@ -36,14 +36,14 @@ public class UsuariosView
     public String lista(Model model)
     {
         model.addAttribute("usuarios", usuariosRepository.findAll());
-        return "usuarios";
+        return "usuarios/usuarios";
     }
 
     @GetMapping("/view/usuarios/form")
     public String form(Model model)
     {
         model.addAttribute("usuarios", new Usuarios());
-        return "usuariosForm";
+        return "usuarios/usuariosForm";
     }
 
     @PostMapping("/view/usuarios/save")
