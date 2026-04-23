@@ -51,7 +51,7 @@ public class UsuariosView
     {
         usuariosRepository.save(usuarios);
         ra.addFlashAttribute("mensaje", "Usuario registrado exitosamente");
-        return "redirect:/view/usuarios";
+        return "redirect:/view/usuarios/usuarios";
     }
 
     @GetMapping("/view/usuarios/edit/{id}")
@@ -59,7 +59,7 @@ public class UsuariosView
     {
         Usuarios usuarios = usuariosRepository.findById(id).orElse(null);
         model.addAttribute("usuarios", usuarios);
-        return "usuariosForm";
+        return "usuarios/usuariosForm";
     }
 
     @PostMapping("/view/usuarios/delete/{id}")
@@ -67,7 +67,7 @@ public class UsuariosView
     {
         usuariosRepository.deleteById(id);
         ra.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
-        return "redirect:/view/usuarios";
+        return "redirect:/view/usuarios/usuarios";
     }
 
 
