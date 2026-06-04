@@ -60,8 +60,13 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
-                                    <input type="text" th:field="*{rol}" required placeholder="Ingrese el rol"
-                                           class="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-800 shadow-sm transition duration-300 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-100" />
+                                    <select th:field="*{rol}" required
+                                            class="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-800 shadow-sm transition duration-300 focus:border-green-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-100">
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="Instructor">Instructor</option>
+                                        <option value="Administrativo">Administrativo</option>
+                                        <option value="Servicios Generales">Servicios Generales</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-4 pt-4">

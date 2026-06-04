@@ -56,6 +56,12 @@ public class DashboardView {
                         .limit(5)
                         .toList());
 
+        model.addAttribute("ultimosPersonal",
+                personalRepository.findAll().stream()
+                        .sorted((a, b) -> b.getId_personal() - a.getId_personal())
+                        .limit(5)
+                        .toList());
+
         return "dashboard";
     }
 }

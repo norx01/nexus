@@ -107,7 +107,7 @@
             </div>
 
             <!-- Tablas recientes -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- Últimas visitas externas -->
                 <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-xl overflow-hidden">
@@ -175,6 +175,44 @@
                             </tr>
                             <tr th:if="${#lists.isEmpty(ultimosPrestamos)}">
                                 <td colspan="4" class="px-4 py-6 text-center text-gray-400">Sin registros recientes</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Últimos personal registrado -->
+                <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-green-100 bg-gradient-to-r from-white to-green-50 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-green-700">👨‍💼 Últimos Personal Registrado</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Los 5 registros más recientes</p>
+                        </div>
+                        <a th:href="@{/view/personal}" class="text-xs text-green-600 font-semibold hover:underline">Ver todos →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                            <tr class="bg-green-50 text-green-800 text-xs uppercase">
+                                <th class="px-4 py-3 text-left font-bold">Nombre</th>
+                                <th class="px-4 py-3 text-left font-bold">Rol</th>
+                                <th class="px-4 py-3 text-left font-bold">Documento</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                            <tr th:each="p : ${ultimosPersonal}" class="hover:bg-green-50/50 transition">
+                                <td class="px-4 py-3 font-medium text-gray-700" th:text="${p.nombre}"></td>
+                                <td class="px-4 py-3">
+                                    <span th:text="${p.rol}"
+                                          th:class="${p.rol == 'Instructor'} ? 'bg-blue-100 text-blue-700 px-2 py-0.5 rounded-xl text-xs font-semibold' :
+                                                     (${p.rol == 'Administrativo'} ? 'bg-purple-100 text-purple-700 px-2 py-0.5 rounded-xl text-xs font-semibold' :
+                                                     'bg-gray-100 text-gray-600 px-2 py-0.5 rounded-xl text-xs font-semibold')">
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-500 font-mono text-xs" th:text="${p.documento}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ultimosPersonal)}">
+                                <td colspan="3" class="px-4 py-6 text-center text-gray-400">Sin registros recientes</td>
                             </tr>
                             </tbody>
                         </table>

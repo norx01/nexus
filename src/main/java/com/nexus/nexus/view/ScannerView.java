@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class ScannerView {
@@ -25,18 +27,7 @@ public class ScannerView {
 
     @GetMapping("/scanner")
     public String scannerPage(Model model) {
-        // Registros activos de hoy
-        List<RegistroEntradaPersonal> dentroHoy = registroRepository
-                .findByFecha(LocalDate.now())
-                .stream()
-                .filter(r -> "Dentro".equals(r.getEstado()))
-                .toList();
-
-        model.addAttribute("dentroHoy", dentroHoy);
-        model.addAttribute("personalMap", personalRepository.findAll()
-                .stream()
-                .collect(java.util.stream.Collectors.toMap(Personal::getId_personal, Personal::getNombre)));
-
+        cargarModelo(model);
         return "scanner";
     }
 
@@ -46,7 +37,8 @@ public class ScannerView {
 
         if (personalOpt.isEmpty()) {
             model.addAttribute("error", "No se encontró ningún instructor con cédula: " + cedula);
-            return regresarScanner(model);
+            cargarModelo(model);
+            return "scanner";
         }
 
         Personal personal = personalOpt.get();
@@ -73,10 +65,22 @@ public class ScannerView {
             model.addAttribute("exito", "🚪 SALIDA registrada para " + personal.getNombre() + " a las " + ahora);
         }
 
-        return regresarScanner(model);
+        cargarModelo(model);
+        return "scanner";
     }
 
-    private String regresarScanner(Model model) {
+    private void cargarModelo(Model model) {
+        List<Personal> todoElPersonal = personalRepository.findAll();
+
+        Map<Integer, String> personalMap = todoElPersonal.stream()
+                .collect(Collectors.toMap(Personal::getId_personal, Personal::getNombre));
+
+        Map<Integer, String> rolMap = todoElPersonal.stream()
+                .collect(Collectors.toMap(
+                        Personal::getId_personal,
+                        p -> p.getRol() != null ? p.getRol() : "Sin rol"
+                ));
+
         List<RegistroEntradaPersonal> dentroHoy = registroRepository
                 .findByFecha(LocalDate.now())
                 .stream()
@@ -84,10 +88,7 @@ public class ScannerView {
                 .toList();
 
         model.addAttribute("dentroHoy", dentroHoy);
-        model.addAttribute("personalMap", personalRepository.findAll()
-                .stream()
-                .collect(java.util.stream.Collectors.toMap(Personal::getId_personal, Personal::getNombre)));
-
-        return "scanner";
+        model.addAttribute("personalMap", personalMap);
+        model.addAttribute("rolMap", rolMap);
     }
 }

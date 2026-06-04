@@ -115,10 +115,15 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-bold text-white text-lg truncate"
-                           th:text="${personalMap[reg.id_personal]} ?: 'Instructor #' + ${reg.id_personal}"></p>
-                        <div class="flex items-center gap-3 mt-1">
+                           th:text="${personalMap[reg.id_personal]} ?: 'Personal #' + ${reg.id_personal}"></p>
+                        <div class="flex items-center gap-2 mt-1 flex-wrap">
                             <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-lg font-mono">
                                 🟢 DENTRO
+                            </span>
+                            <span th:text="${rolMap[reg.id_personal]}"
+                                  th:class="${rolMap[reg.id_personal] == 'Instructor'} ? 'text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-lg font-semibold' :
+                                             (${rolMap[reg.id_personal] == 'Administrativo'} ? 'text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-lg font-semibold' :
+                                             'text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded-lg font-semibold')">
                             </span>
                             <span class="text-sm text-gray-400 font-mono">
                                 Entrada: <strong class="text-white" th:text="${reg.hora_entrada}"></strong>
