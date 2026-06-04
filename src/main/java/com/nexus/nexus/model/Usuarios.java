@@ -29,9 +29,15 @@ public class Usuarios
     @NotNull(message = "La fecha es obligatoria")
     private Date fecha;
 
-    @NotNull(message = "El dni es obligatorio")
-    private Integer dni;
+    @NotNull(message = "El documento es obligatorio")
+    private Integer documento;
 
     @NotBlank(message = "El correo es obligatorio")
     private String correo;
+
+    private String username;
+
+    private String password;
+
+    private Long id_rol;
 }

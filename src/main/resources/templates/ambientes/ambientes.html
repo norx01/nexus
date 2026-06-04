@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Ambientes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-white to-emerald-100 text-gray-800">
+<div class="flex min-h-screen">
+    <div th:replace="fragments/layout :: sidebar('ambientes')"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 z-20 hidden"></div>
+    <div class="flex-1">
+        <div th:replace="fragments/layout :: topbar('Gestión de Ambientes')"></div>
+        <main class="p-4 md:p-8">
+            <div th:if="${success}" class="mb-6">
+                <div class="rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-green-800 shadow-sm" th:text="${success}"></div>
+            </div>
+            <div class="flex flex-wrap gap-4 mb-8">
+                <a th:href="@{/view/ambientes/form}" class="rounded-2xl bg-gradient-to-r from-green-700 to-emerald-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
+                    📝 Registrar Ambiente
+                </a>
+                <a th:href="@{/view/ambientes/pdf}" class="rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
+                    📄 Exportar PDF
+                </a>
+                <a th:href="@{/view/ambientes/excel}" class="rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
+                    📊 Exportar Excel
+                </a>
+            </div>
+            <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-2xl overflow-hidden">
+                <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-white to-green-50">
+                    <h2 class="text-xl md:text-2xl font-bold text-green-700">Lista de Ambientes Registrados</h2>
+                    <p class="text-sm text-gray-500 mt-1">Consulta y administra los registros del sistema</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                        <tr class="bg-green-100 text-green-900 text-sm uppercase tracking-wide">
+                            <th class="px-6 py-4 text-center font-bold">⚙️</th>
+                            <th class="px-6 py-4 text-left font-bold">ID Ambiente</th>
+                            <th class="px-6 py-4 text-left font-bold">Nombre</th>
+                            <th class="px-6 py-4 text-left font-bold">Sede</th>
+                            <th class="px-6 py-4 text-left font-bold">Estado</th>
+                            <th class="px-6 py-4 text-left font-bold">Observaciones</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                        <tr th:each="ambiente : ${ambientes}" class="hover:bg-green-50/70 transition duration-200">
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <a th:href="@{'/view/ambientes/edit/' + ${ambiente.id_ambiente}}"
+                                       class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-amber-400 text-white shadow-md hover:bg-amber-500 hover:scale-105 transition">✏️</a>
+                                    <form th:action="@{'/view/ambientes/delete/' + ${ambiente.id_ambiente}}" method="post" class="inline">
+                                        <button type="submit"
+                                                class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-red-500 text-white shadow-md hover:bg-red-600 hover:scale-105 transition"
+                                                onclick="return confirm('¿Está seguro que desea eliminar este ambiente?')">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-700" th:text="${ambiente.id_ambiente}"></td>
+                            <td class="px-6 py-4 text-gray-700" th:text="${ambiente.nombre}"></td>
+                            <td class="px-6 py-4 text-gray-700" th:text="${ambiente.sede}"></td>
+                            <td class="px-6 py-4 text-green-700 font-medium" th:text="${ambiente.estado}"></td>
+                            <td class="px-6 py-4 text-gray-700" th:text="${ambiente.observaciones}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ambientes)}">
+                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">No hay ambientes registrados en este momento.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/script.js}" defer></script>
+</body>
+</html>

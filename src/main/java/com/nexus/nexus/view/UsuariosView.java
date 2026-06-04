@@ -7,6 +7,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.nexus.nexus.model.Usuarios;
+import com.nexus.nexus.repository.RolRepository;
 import com.nexus.nexus.repository.UsuariosRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,12 @@ public class UsuariosView
     @Autowired
     private UsuariosRepository usuariosRepository;
 
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/view/usuarios")
     public String lista(Model model)
     {
@@ -43,22 +51,31 @@ public class UsuariosView
     public String form(Model model)
     {
         model.addAttribute("usuarios", new Usuarios());
+        model.addAttribute("roles", rolRepository.findAll());
         return "usuarios/usuariosForm";
     }
 
     @PostMapping("/view/usuarios/save")
     public String save(@ModelAttribute Usuarios usuarios, RedirectAttributes ra)
     {
+        if (usuarios.getPassword() != null && !usuarios.getPassword().isBlank()) {
+            usuarios.setPassword(passwordEncoder.encode(usuarios.getPassword()));
+        } else if (usuarios.getId_usuario() != null) {
+            usuariosRepository.findById(usuarios.getId_usuario())
+                    .ifPresent(u -> usuarios.setPassword(u.getPassword()));
+        }
         usuariosRepository.save(usuarios);
-        ra.addFlashAttribute("mensaje", "Usuario registrado exitosamente");
-        return "redirect:/view/usuarios/usuarios";
+        ra.addFlashAttribute("success", "Usuario registrado exitosamente");
+        return "redirect:/view/usuarios";
     }
 
     @GetMapping("/view/usuarios/edit/{id}")
     public String edit(@PathVariable Long id, Model model)
     {
         Usuarios usuarios = usuariosRepository.findById(id).orElse(null);
+        if (usuarios != null) usuarios.setPassword("");
         model.addAttribute("usuarios", usuarios);
+        model.addAttribute("roles", rolRepository.findAll());
         return "usuarios/usuariosForm";
     }
 
@@ -66,8 +83,8 @@ public class UsuariosView
     public String delete(@PathVariable Long id, RedirectAttributes ra)
     {
         usuariosRepository.deleteById(id);
-        ra.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
-        return "redirect:/view/usuarios/usuarios";
+        ra.addFlashAttribute("success", "Usuario eliminado exitosamente");
+        return "redirect:/view/usuarios";
     }
 
 
@@ -95,7 +112,7 @@ public class UsuariosView
         table.addCell("Nombre");
         table.addCell("Apellido");
         table.addCell("Fecha");
-        table.addCell("Dni");
+        table.addCell("Documento");
         table.addCell("Correo");
 
         //filas
@@ -105,7 +122,7 @@ public class UsuariosView
             table.addCell(usuarios.getNombre());
             table.addCell(usuarios.getApellido());
             table.addCell(usuarios.getFecha().toString());
-            table.addCell(usuarios.getDni().toString());
+            table.addCell(usuarios.getDocumento().toString());
             table.addCell(usuarios.getCorreo());
         }
 
@@ -130,7 +147,7 @@ public class UsuariosView
         headerRow.createCell(1).setCellValue("Nombre");
         headerRow.createCell(2).setCellValue("Apellido");
         headerRow.createCell(3).setCellValue("Fecha");
-        headerRow.createCell(4).setCellValue("Dni");
+        headerRow.createCell(4).setCellValue("Documentos");
         headerRow.createCell(5).setCellValue("Correo");
 
         // Agregar datos
@@ -141,7 +158,7 @@ public class UsuariosView
             row.createCell(1).setCellValue(f.getNombre());
             row.createCell(2).setCellValue(f.getApellido());
             row.createCell(3).setCellValue(f.getFecha());
-            row.createCell(4).setCellValue(f.getDni());
+            row.createCell(4).setCellValue(f.getDocumento());
             row.createCell(5).setCellValue(f.getCorreo());
         }
 

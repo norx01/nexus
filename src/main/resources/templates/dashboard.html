@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NEXUS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-white to-emerald-100 text-gray-800">
+<div class="flex min-h-screen">
+
+    <div th:replace="fragments/layout :: sidebar('inicio')"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/40 z-20 hidden"></div>
+
+    <div class="flex-1">
+        <div th:replace="fragments/layout :: topbar('Dashboard')"></div>
+
+        <main class="p-4 md:p-8">
+
+            <!-- Bienvenida -->
+            <div class="mb-8 rounded-3xl bg-gradient-to-r from-green-700 to-emerald-500 p-6 text-white shadow-xl">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">🏠</div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold">
+                            Bienvenido, <span sec:authentication="name">Usuario</span>
+                        </h2>
+                        <p class="text-green-100 mt-1">Panel de control del sistema NEXUS</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">👥</span>
+                        <span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-1 rounded-xl">Usuarios</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-green-700" th:text="${totalUsuarios}">0</p>
+                    <p class="text-sm text-gray-500">Usuarios registrados</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">👨‍💼</span>
+                        <span class="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-xl">Personal</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-blue-700" th:text="${totalPersonal}">0</p>
+                    <p class="text-sm text-gray-500">Personal interno</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">👤</span>
+                        <span class="text-xs font-semibold bg-purple-100 text-purple-700 px-2 py-1 rounded-xl">Externos</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-purple-700" th:text="${totalPersonalExterno}">0</p>
+                    <p class="text-sm text-gray-500">Visitas externas</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">🕵️</span>
+                        <span class="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-1 rounded-xl">Agentes</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-orange-700" th:text="${totalAgentes}">0</p>
+                    <p class="text-sm text-gray-500">Agentes activos</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">🏫</span>
+                        <span class="text-xs font-semibold bg-teal-100 text-teal-700 px-2 py-1 rounded-xl">Ambientes</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-teal-700" th:text="${totalAmbientes}">0</p>
+                    <p class="text-sm text-gray-500">
+                        <span th:text="${totalAmbientesDisponibles}">0</span> disponibles
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">🔑</span>
+                        <span class="text-xs font-semibold bg-yellow-100 text-yellow-700 px-2 py-1 rounded-xl">Llaves</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-yellow-700" th:text="${totalLlaves}">0</p>
+                    <p class="text-sm text-gray-500">
+                        <span th:text="${totalLlavesDisponibles}">0</span> disponibles
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-green-100 p-5 flex flex-col gap-2 hover:shadow-lg transition">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl">📋</span>
+                        <span class="text-xs font-semibold bg-rose-100 text-rose-700 px-2 py-1 rounded-xl">Préstamos</span>
+                    </div>
+                    <p class="text-4xl font-extrabold text-rose-700" th:text="${totalPrestamos}">0</p>
+                    <p class="text-sm text-gray-500">Préstamos de ambientes</p>
+                </div>
+
+            </div>
+
+            <!-- Tablas recientes -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Últimas visitas externas -->
+                <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-green-100 bg-gradient-to-r from-white to-green-50 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-green-700">👤 Últimas Visitas Externas</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Los 5 registros más recientes</p>
+                        </div>
+                        <a th:href="@{/view/personalExterno}" class="text-xs text-green-600 font-semibold hover:underline">Ver todos →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                            <tr class="bg-green-50 text-green-800 text-xs uppercase">
+                                <th class="px-4 py-3 text-left font-bold">Nombre</th>
+                                <th class="px-4 py-3 text-left font-bold">Empresa</th>
+                                <th class="px-4 py-3 text-left font-bold">Fecha</th>
+                                <th class="px-4 py-3 text-left font-bold">Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                            <tr th:each="ext : ${ultimosExternos}" class="hover:bg-green-50/50 transition">
+                                <td class="px-4 py-3 font-medium text-gray-700" th:text="${ext.nombre}"></td>
+                                <td class="px-4 py-3 text-gray-500" th:text="${ext.empresa}"></td>
+                                <td class="px-4 py-3 text-gray-500" th:text="${ext.fecha_visita}"></td>
+                                <td class="px-4 py-3">
+                                    <span th:text="${ext.estado}"
+                                          th:class="${ext.estado == 'Activo'} ? 'bg-green-100 text-green-700 px-2 py-0.5 rounded-xl text-xs font-semibold' : 'bg-gray-100 text-gray-600 px-2 py-0.5 rounded-xl text-xs font-semibold'">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ultimosExternos)}">
+                                <td colspan="4" class="px-4 py-6 text-center text-gray-400">Sin registros recientes</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Últimos préstamos -->
+                <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-green-100 bg-gradient-to-r from-white to-green-50 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-green-700">📋 Últimos Préstamos de Ambientes</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Los 5 registros más recientes</p>
+                        </div>
+                        <a th:href="@{/view/prestamoAmbientes}" class="text-xs text-green-600 font-semibold hover:underline">Ver todos →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                            <tr class="bg-green-50 text-green-800 text-xs uppercase">
+                                <th class="px-4 py-3 text-left font-bold">ID Personal</th>
+                                <th class="px-4 py-3 text-left font-bold">ID Ambiente</th>
+                                <th class="px-4 py-3 text-left font-bold">Fecha</th>
+                                <th class="px-4 py-3 text-left font-bold">Entrada</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                            <tr th:each="p : ${ultimosPrestamos}" class="hover:bg-green-50/50 transition">
+                                <td class="px-4 py-3 font-medium text-gray-700" th:text="${p.id_personal}"></td>
+                                <td class="px-4 py-3 text-gray-500" th:text="${p.id_ambiente}"></td>
+                                <td class="px-4 py-3 text-gray-500" th:text="${p.fecha}"></td>
+                                <td class="px-4 py-3 text-gray-500" th:text="${p.hora_entrada}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ultimosPrestamos)}">
+                                <td colspan="4" class="px-4 py-6 text-center text-gray-400">Sin registros recientes</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/script.js}" defer></script>
+</body>
+</html>
