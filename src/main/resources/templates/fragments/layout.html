@@ -26,6 +26,13 @@
 
             <!-- Solo Administrador -->
             <div sec:authorize="hasRole('ADMINISTRADOR')">
+                <a th:href="@{/view/historial}"
+                   th:class="${activeMenu == 'historial'}
+                       ? 'flex items-center gap-3 rounded-2xl px-4 py-3 bg-white text-green-700 shadow-md font-bold'
+                       : 'flex items-center gap-3 rounded-2xl px-4 py-3 hover:bg-white/20 transition font-medium'">
+                    <span>📊</span><span>Historial Instructores</span>
+                </a>
+
                 <a th:href="@{/view/usuarios}"
                    th:class="${activeMenu == 'usuarios'}
                        ? 'flex items-center gap-3 rounded-2xl px-4 py-3 bg-white text-green-700 shadow-md font-bold'
@@ -52,6 +59,23 @@
                        ? 'flex items-center gap-3 rounded-2xl px-4 py-3 bg-white text-green-700 shadow-md font-bold'
                        : 'flex items-center gap-3 rounded-2xl px-4 py-3 hover:bg-white/20 transition font-medium'">
                     <span>👨‍💼</span><span>Personal</span>
+                </a>
+            </div>
+
+            <!-- Accesos rápidos (ambos roles) -->
+            <div class="pt-1 pb-1">
+                <p class="text-xs text-green-300 font-bold uppercase tracking-widest px-4 pb-1">Acceso rápido</p>
+                <a th:href="@{/scanner}"
+                   th:class="${activeMenu == 'scanner'}
+                       ? 'flex items-center gap-3 rounded-2xl px-4 py-3 bg-white text-green-700 shadow-md font-bold'
+                       : 'flex items-center gap-3 rounded-2xl px-4 py-3 hover:bg-white/20 transition font-medium'">
+                    <span>📡</span><span>Scanner Instructores</span>
+                </a>
+                <a th:href="@{/autoservicio}"
+                   th:class="${activeMenu == 'autoservicio'}
+                       ? 'flex items-center gap-3 rounded-2xl px-4 py-3 bg-white text-green-700 shadow-md font-bold'
+                       : 'flex items-center gap-3 rounded-2xl px-4 py-3 hover:bg-white/20 transition font-medium'">
+                    <span>🔑</span><span>Autoservicio Ambs.</span>
                 </a>
             </div>
 

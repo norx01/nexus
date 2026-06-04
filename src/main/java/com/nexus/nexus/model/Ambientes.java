@@ -27,4 +27,6 @@ public class Ambientes {
     private String estado;
 
     private String observaciones;
+
+    private Integer id_personal_activo; // NULL = disponible
 }

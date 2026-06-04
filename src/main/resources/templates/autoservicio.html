@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Préstamo de Ambientes - NEXUS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-green-900 via-gray-900 to-emerald-900 text-white">
+
+<!-- Header -->
+<header class="bg-black/30 backdrop-blur border-b border-white/10 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center font-black text-xl">N</div>
+        <div>
+            <h1 class="text-lg font-extrabold">NEXUS APP</h1>
+            <p class="text-xs text-green-400">Autoservicio · Préstamo de Ambientes</p>
+        </div>
+    </div>
+    <div class="flex gap-3">
+        <a th:href="@{/scanner}"
+           class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2 text-sm font-semibold transition">
+            📡 Scanner
+        </a>
+        <a th:href="@{/login}"
+           class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2 text-sm font-semibold transition">
+            🔒 Vigilante
+        </a>
+    </div>
+</header>
+
+<main class="flex items-center justify-center min-h-[calc(100vh-72px)] p-6">
+    <div class="w-full max-w-lg">
+
+        <!-- Notificaciones flash -->
+        <div th:if="${exito}" class="mb-6 rounded-2xl bg-green-500/20 border border-green-400 px-5 py-4 text-green-300 font-bold text-center">
+            <span th:text="${exito}"></span>
+        </div>
+        <div th:if="${error}" class="mb-6 rounded-2xl bg-red-500/20 border border-red-400 px-5 py-4 text-red-300 font-bold text-center">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- ================== PASO 1: Ingresar cédula ================== -->
+        <div th:if="${step == 'cedula'}" class="bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="mx-auto w-24 h-24 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center text-5xl mb-4">🔑</div>
+                <h2 class="text-3xl font-extrabold">Préstamo de Ambiente</h2>
+                <p class="text-gray-400 mt-2">Ingrese o escanee su número de cédula para continuar</p>
+            </div>
+
+            <form th:action="@{/autoservicio/buscar}" method="post">
+                <input type="text"
+                       name="cedula"
+                       id="cedulaInput"
+                       placeholder="Número de cédula"
+                       autofocus
+                       autocomplete="off"
+                       class="w-full bg-white/10 border-2 border-white/30 rounded-2xl px-6 py-4 text-2xl font-mono text-white placeholder-gray-500 focus:outline-none focus:border-green-400 focus:ring-4 focus:ring-green-500/20 text-center tracking-widest mb-4"
+                       oninput="autoSubmitCedula(this)" />
+                <button type="submit"
+                        class="w-full rounded-2xl bg-green-600 hover:bg-green-500 py-4 text-lg font-bold transition">
+                    Continuar →
+                </button>
+            </form>
+        </div>
+
+        <!-- ================== PASO 2A: RESERVAR ambiente/llave ================== -->
+        <div th:if="${step == 'reservar'}" class="bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center text-4xl mb-3">👨‍🏫</div>
+                <h2 class="text-2xl font-extrabold" th:text="${personal.nombre}">Instructor</h2>
+                <p class="text-gray-400 text-sm mt-1" th:text="'CC: ' + ${personal.documento}"></p>
+                <span class="inline-block mt-2 bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-xl">Sin préstamo activo</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(ambientes)}"
+                 class="text-center py-8 text-gray-400">
+                <span class="text-4xl">🏫</span>
+                <p class="mt-2">No hay ambientes disponibles en este momento.</p>
+            </div>
+
+            <form th:if="${!#lists.isEmpty(ambientes)}" th:action="@{/autoservicio/reservar}" method="post" id="reservaForm">
+                <input type="hidden" name="idPersonal" th:value="${personal.id_personal}" />
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">🏫 Seleccione el Ambiente</label>
+                        <select name="idAmbiente" id="selectAmbiente" required
+                                onchange="cargarLlaves(this.value)"
+                                class="w-full bg-gray-800 border border-white/20 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-500/20">
+                            <option value="">-- Seleccione un ambiente --</option>
+                            <option th:each="a : ${ambientes}"
+                                    th:value="${a.id_ambiente}"
+                                    th:text="${a.nombre} + ' — ' + ${a.sede}"></option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">🔑 Seleccione la Llave</label>
+                        <select name="idLlave" id="selectLlave" required
+                                class="w-full bg-gray-800 border border-white/20 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-500/20">
+                            <option value="">-- Primero seleccione un ambiente --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <a th:href="@{/autoservicio}"
+                       class="flex-1 rounded-2xl bg-white/10 hover:bg-white/20 py-3 text-center font-semibold transition">
+                        ← Volver
+                    </a>
+                    <button type="submit"
+                            class="flex-1 rounded-2xl bg-green-600 hover:bg-green-500 py-3 font-bold transition">
+                        ✅ Tomar Préstamo
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================== PASO 2B: LIBERAR préstamo activo ================== -->
+        <div th:if="${step == 'liberar'}" class="bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-orange-500/20 border-2 border-orange-400 flex items-center justify-center text-4xl mb-3">👨‍🏫</div>
+                <h2 class="text-2xl font-extrabold" th:text="${personal.nombre}">Instructor</h2>
+                <p class="text-gray-400 text-sm mt-1" th:text="'CC: ' + ${personal.documento}"></p>
+                <span class="inline-block mt-2 bg-orange-500/20 text-orange-400 text-xs font-bold px-3 py-1 rounded-xl">⚠️ Préstamo activo</span>
+            </div>
+
+            <!-- Info del préstamo actual -->
+            <div class="bg-orange-500/10 border border-orange-400/30 rounded-2xl p-5 mb-6">
+                <h3 class="font-bold text-orange-300 mb-3">📋 Préstamo en curso</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Ambiente:</span>
+                        <span class="font-bold text-white" th:text="${ambiente?.nombre} ?: 'N/A'"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Sede:</span>
+                        <span class="text-gray-300" th:text="${ambiente?.sede} ?: 'N/A'"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Llave:</span>
+                        <span class="font-bold text-white" th:text="${llave?.nombre} ?: 'Sin llave'"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Fecha:</span>
+                        <span class="text-gray-300" th:text="${prestamo.fecha}"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Hora entrada:</span>
+                        <span class="font-mono font-bold text-green-400" th:text="${prestamo.hora_entrada}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/autoservicio/liberar}" method="post">
+                <input type="hidden" name="idPrestamo" th:value="${prestamo.id_prestamo}" />
+                <div class="flex gap-3">
+                    <a th:href="@{/autoservicio}"
+                       class="flex-1 rounded-2xl bg-white/10 hover:bg-white/20 py-3 text-center font-semibold transition">
+                        ← Volver
+                    </a>
+                    <button type="submit"
+                            class="flex-1 rounded-2xl bg-orange-600 hover:bg-orange-500 py-3 font-bold transition"
+                            onclick="return confirm('¿Confirma que está devolviendo el ambiente y la llave?')">
+                        🔓 Liberar Ambiente y Llave
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // Auto-submit para barcode scanner en campo cédula
+    let scanTimer;
+    function autoSubmitCedula(input) {
+        clearTimeout(scanTimer);
+        if (input.value.length >= 6) {
+            scanTimer = setTimeout(() => input.form.submit(), 300);
+        }
+    }
+
+    // Cargar llaves disponibles via AJAX según ambiente seleccionado
+    function cargarLlaves(idAmbiente) {
+        const selectLlave = document.getElementById('selectLlave');
+        selectLlave.innerHTML = '<option value="">Cargando llaves...</option>';
+
+        if (!idAmbiente) {
+            selectLlave.innerHTML = '<option value="">-- Primero seleccione un ambiente --</option>';
+            return;
+        }
+
+        fetch('/autoservicio/llaves/' + idAmbiente)
+            .then(r => r.json())
+            .then(llaves => {
+                if (llaves.length === 0) {
+                    selectLlave.innerHTML = '<option value="">No hay llaves disponibles para este ambiente</option>';
+                } else {
+                    selectLlave.innerHTML = '<option value="">-- Seleccione una llave --</option>';
+                    llaves.forEach(l => {
+                        selectLlave.innerHTML += `<option value="${l.id_llave}">${l.nombre}</option>`;
+                    });
+                }
+            })
+            .catch(() => {
+                selectLlave.innerHTML = '<option value="">Error cargando llaves</option>';
+            });
+    }
+</script>
+</body>
+</html>

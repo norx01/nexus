@@ -31,22 +31,59 @@ public class PersonalExternoView
     @GetMapping("/view/personalExterno")
     public String lista(Model model)
     {
-        model.addAttribute("personalExterno", personalExternoRepository.findAll());
+        var todos = personalExternoRepository.findAll();
+        // Separar: activos (en instalaciones) y retirados del día
+        var enInstalaciones = todos.stream()
+                .filter(p -> p.getHora_salida() == null || "En instalaciones".equalsIgnoreCase(p.getEstado()))
+                .sorted((a, b) -> {
+                    if (a.getFecha_visita() == null) return 1;
+                    if (b.getFecha_visita() == null) return -1;
+                    return b.getFecha_visita().compareTo(a.getFecha_visita());
+                })
+                .toList();
+        model.addAttribute("enInstalaciones", enInstalaciones);
+        model.addAttribute("personalExterno", todos);
         return "personalExterno/personalExterno";
     }
 
     @GetMapping("/view/personalExterno/form")
     public String form(Model model)
     {
-        model.addAttribute("personalExterno", new PersonalExterno());
+        PersonalExterno nuevo = new PersonalExterno();
+        nuevo.setFecha_visita(java.time.LocalDate.now());
+        nuevo.setHora_ingreso(java.time.LocalTime.now().withNano(0));
+        nuevo.setEstado("En instalaciones");
+        nuevo.setFecha_creacion(java.time.LocalDate.now());
+        model.addAttribute("personalExterno", nuevo);
         return "personalExterno/personalExternoForm";
     }
 
     @PostMapping("/view/personalExterno/save")
     public String save(@ModelAttribute PersonalExterno personalExterno, RedirectAttributes ra)
     {
+        if (personalExterno.getFecha_visita() == null)
+            personalExterno.setFecha_visita(java.time.LocalDate.now());
+        if (personalExterno.getHora_ingreso() == null)
+            personalExterno.setHora_ingreso(java.time.LocalTime.now().withNano(0));
+        if (personalExterno.getEstado() == null || personalExterno.getEstado().isBlank())
+            personalExterno.setEstado("En instalaciones");
+        if (personalExterno.getFecha_creacion() == null)
+            personalExterno.setFecha_creacion(java.time.LocalDate.now());
+
         personalExternoRepository.save(personalExterno);
-        ra.addFlashAttribute("mensaje", "Usuario registrado exitosamente");
+        ra.addFlashAttribute("success", "Visita registrada exitosamente");
+        return "redirect:/view/personalExterno";
+    }
+
+    @PostMapping("/view/personalExterno/salida/{id}")
+    public String registrarSalida(@PathVariable Long id, RedirectAttributes ra)
+    {
+        personalExternoRepository.findById(id).ifPresent(p -> {
+            p.setHora_salida(java.time.LocalTime.now().withNano(0));
+            p.setEstado("Retirado");
+            personalExternoRepository.save(p);
+        });
+        ra.addFlashAttribute("success", "Salida registrada exitosamente");
         return "redirect:/view/personalExterno";
     }
 
@@ -62,7 +99,7 @@ public class PersonalExternoView
     public String delete(@PathVariable Long id, RedirectAttributes ra)
     {
         personalExternoRepository.deleteById(id);
-        ra.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
+        ra.addFlashAttribute("success", "Registro eliminado exitosamente");
         return "redirect:/view/personalExterno";
     }
 

@@ -3,24 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Personal Externo</title>
-
+    <title>Personal Externo - NEXUS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-gradient-to-br from-green-50 via-white to-emerald-100 text-gray-800">
-
 <div class="flex min-h-screen">
-
     <div th:replace="fragments/layout :: sidebar('personalExterno')"></div>
-
     <div id="overlay" class="fixed inset-0 bg-black/40 z-20 hidden"></div>
 
     <div class="flex-1">
@@ -28,108 +19,139 @@
 
         <main class="p-4 md:p-8">
 
-            <div th:if="${success}" class="mb-6">
-                <div class="rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-green-800 shadow-sm"
-                     th:text="${success}">
-                </div>
-            </div>
+            <!-- Flash messages -->
+            <div th:if="${success}" class="mb-5 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-green-800 shadow-sm font-semibold" th:text="${success}"></div>
 
-            <div class="flex flex-wrap gap-4 mb-8">
+            <!-- Acciones rápidas -->
+            <div class="flex flex-wrap gap-3 mb-8">
                 <a th:href="@{/view/personalExterno/form}"
-                   class="rounded-2xl bg-gradient-to-r from-green-700 to-emerald-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
-                    📝 Registrar Personal Externo
+                   class="rounded-2xl bg-gradient-to-r from-green-700 to-emerald-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition flex items-center gap-2">
+                    📝 Registrar Visita
                 </a>
-
                 <a th:href="@{/view/personalExterno/pdf}"
                    class="rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
                     📄 Exportar PDF
                 </a>
-
                 <a th:href="@{/view/personalExterno/excel}"
                    class="rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 px-5 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition">
                     📊 Exportar Excel
                 </a>
             </div>
 
-            <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-2xl overflow-hidden">
-                <div class="px-6 py-5 border-b border-green-100 bg-gradient-to-r from-white to-green-50">
-                    <h2 class="text-xl md:text-2xl font-bold text-green-700">
-                        Lista de personal Externo Registrados
-                    </h2>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Consulta y administra los registros del sistema
-                    </p>
+            <!-- ====== SECCIÓN: EN INSTALACIONES ====== -->
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                    <h2 class="text-xl font-bold text-green-700">Personas actualmente en instalaciones</h2>
+                    <span class="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-xl"
+                          th:text="${#lists.size(enInstalaciones)}">0</span>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead>
-                        <tr class="bg-green-100 text-green-900 text-sm uppercase tracking-wide">
-                            <th class="px-6 py-4 text-center font-bold">⚙️</th>
-                            <th class="px-6 py-4 text-left font-bold">ID personal Externo</th>
-                            <th class="px-6 py-4 text-left font-bold">Nombre</th>
-                            <th class="px-6 py-4 text-left font-bold">Tipo de documento</th>
-                            <th class="px-6 py-4 text-left font-bold">Documento</th>
-                            <th class="px-6 py-4 text-left font-bold">Telefono</th>
-                            <th class="px-6 py-4 text-left font-bold">Empresa</th>
-                            <th class="px-6 py-4 text-left font-bold">Motivo Visita</th>
-                            <th class="px-6 py-4 text-left font-bold">Fecha de visita</th>
-                            <th class="px-6 py-4 text-left font-bold">Hora ingreso</th>
-                            <th class="px-6 py-4 text-left font-bold">Hora salida</th>
-                            <th class="px-6 py-4 text-left font-bold">Tiempo de estancia</th>
-                            <th class="px-6 py-4 text-left font-bold">Estado</th>
-                            <th class="px-6 py-4 text-left font-bold">Fecha de creacion</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                        <tr th:each="personalExterno : ${personalExterno}" class="hover:bg-green-50/70 transition duration-200">
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <a th:href="@{'/view/personalExterno/edit/' + ${personalExterno.id_personal_externo}}"
-                                       class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-amber-400 text-white shadow-md hover:bg-amber-500 hover:scale-105 transition">
-                                        ✏️
-                                    </a>
+                <div th:if="${#lists.isEmpty(enInstalaciones)}"
+                     class="bg-white/70 rounded-2xl p-8 text-center text-gray-500 border border-green-100">
+                    <span class="text-4xl">🏫</span>
+                    <p class="mt-2">No hay visitantes externos en las instalaciones actualmente.</p>
+                </div>
 
-                                    <form th:action="@{'/view/personalExterno/delete/' + ${personalExterno.id_personal_externo}}" method="post" class="inline">
+                <div th:if="${!#lists.isEmpty(enInstalaciones)}"
+                     class="bg-white/85 backdrop-blur-md border border-green-200 rounded-3xl shadow-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                            <tr class="bg-green-700 text-white text-sm uppercase tracking-wide">
+                                <th class="px-5 py-4 text-center">⚙️</th>
+                                <th class="px-5 py-4 text-left">Nombre</th>
+                                <th class="px-5 py-4 text-left">Documento</th>
+                                <th class="px-5 py-4 text-left">Empresa</th>
+                                <th class="px-5 py-4 text-left">Motivo</th>
+                                <th class="px-5 py-4 text-left">Hora Ingreso</th>
+                                <th class="px-5 py-4 text-center">Salida</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-green-100">
+                            <tr th:each="p : ${enInstalaciones}" class="hover:bg-green-50/70 transition">
+                                <td class="px-5 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a th:href="@{'/view/personalExterno/edit/' + ${p.id_personal_externo}}"
+                                           class="w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center hover:bg-amber-500 transition text-sm">✏️</a>
+                                        <form th:action="@{'/view/personalExterno/delete/' + ${p.id_personal_externo}}" method="post">
+                                            <button type="submit" onclick="return confirm('¿Eliminar registro?')"
+                                                    class="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition text-sm">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 font-bold text-gray-800" th:text="${p.nombre}"></td>
+                                <td class="px-5 py-4 text-gray-600 font-mono text-sm" th:text="${p.documento}"></td>
+                                <td class="px-5 py-4 text-gray-600" th:text="${p.empresa ?: '—'}"></td>
+                                <td class="px-5 py-4 text-gray-600 max-w-xs truncate" th:text="${p.motivo_visita}"></td>
+                                <td class="px-5 py-4 font-mono text-green-700 font-bold" th:text="${p.hora_ingreso}"></td>
+                                <td class="px-5 py-4 text-center">
+                                    <form th:action="@{'/view/personalExterno/salida/' + ${p.id_personal_externo}}" method="post">
                                         <button type="submit"
-                                                class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-red-500 text-white shadow-md hover:bg-red-600 hover:scale-105 transition"
-                                                onclick="return confirm('¿Está seguro que desea eliminar este personal Externo?')">
-                                            🗑️
+                                                class="rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-bold shadow transition"
+                                                onclick="return confirm('¿Registrar salida de ' + '[[${p.nombre}]]' + '?')">
+                                            🚪 Registrar Salida
                                         </button>
                                     </form>
-                                </div>
-                            </td>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                            <td class="px-6 py-4 font-medium text-gray-700" th:text="${personalExterno.id_personal_externo}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.nombre}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.tipo_documento}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.documento}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.telefono}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.empresa}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.motivo_visita}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.fecha_visita}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.hora_ingreso}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.hora_salida}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.tiempo_estancia}"></td>
-                            <td class="px-6 py-4 text-green-700 font-medium" th:text="${personalExterno.estado}"></td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${personalExterno.fecha_creacion}"></td>
+            <!-- ====== SECCIÓN: HISTORIAL COMPLETO ====== -->
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <h2 class="text-xl font-bold text-gray-600">📋 Historial completo de visitas</h2>
+                    <span class="bg-gray-100 text-gray-600 text-sm font-bold px-3 py-1 rounded-xl"
+                          th:text="${#lists.size(personalExterno)}">0</span>
+                </div>
 
-                        </tr>
-
-                        <tr th:if="${#lists.isEmpty(personalExterno)}">
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                                No hay personal Externo registrados en este momento.
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="bg-white/85 backdrop-blur-md border border-green-100 rounded-3xl shadow-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                            <tr class="bg-green-100 text-green-900 text-xs uppercase tracking-wide">
+                                <th class="px-5 py-4 text-left">Nombre</th>
+                                <th class="px-5 py-4 text-left">Doc.</th>
+                                <th class="px-5 py-4 text-left">Empresa</th>
+                                <th class="px-5 py-4 text-left">Fecha</th>
+                                <th class="px-5 py-4 text-left">Ingreso</th>
+                                <th class="px-5 py-4 text-left">Salida</th>
+                                <th class="px-5 py-4 text-left">Tiempo</th>
+                                <th class="px-5 py-4 text-left">Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                            <tr th:each="p : ${personalExterno}" class="hover:bg-green-50/50 transition text-sm">
+                                <td class="px-5 py-3 font-medium text-gray-800" th:text="${p.nombre}"></td>
+                                <td class="px-5 py-3 text-gray-600 font-mono text-xs" th:text="${p.documento}"></td>
+                                <td class="px-5 py-3 text-gray-600" th:text="${p.empresa ?: '—'}"></td>
+                                <td class="px-5 py-3 text-gray-600" th:text="${p.fecha_visita}"></td>
+                                <td class="px-5 py-3 font-mono text-gray-700" th:text="${p.hora_ingreso}"></td>
+                                <td class="px-5 py-3 font-mono text-gray-700" th:text="${p.hora_salida ?: '—'}"></td>
+                                <td class="px-5 py-3 text-gray-500 text-xs"
+                                    th:text="${p.tiempo_estancia != null and p.tiempo_estancia > 0} ? ${p.tiempo_estancia} + ' min' : '—'"></td>
+                                <td class="px-5 py-3">
+                                    <span th:text="${p.estado}"
+                                          th:class="${p.estado == 'En instalaciones'} ? 'bg-green-100 text-green-700 px-2 py-1 rounded-xl text-xs font-bold' : 'bg-gray-100 text-gray-600 px-2 py-1 rounded-xl text-xs font-semibold'">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(personalExterno)}">
+                                <td colspan="8" class="px-5 py-10 text-center text-gray-400">No hay visitas registradas.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 </div>
-
 <script th:src="@{/js/script.js}" defer></script>
 </body>
 </html>

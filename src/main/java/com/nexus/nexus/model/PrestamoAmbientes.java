@@ -32,6 +32,9 @@ public class PrestamoAmbientes {
     @NotNull(message = "La hora de entrada es obligatoria")
     private LocalTime hora_entrada;
 
-    @NotNull(message = "La hora de salida es obligatoria")
-    private LocalTime hora_salida;
+    private Long id_llave; // llave asociada al préstamo
+
+    private LocalTime hora_salida; // NULL = préstamo activo
+
+    private String estado; // "Activo" / "Finalizado"
 }

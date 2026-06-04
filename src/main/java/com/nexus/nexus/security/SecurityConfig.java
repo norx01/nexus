@@ -22,7 +22,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/view/usuarios/**", "/view/agentes/**", "/view/rol/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/scanner", "/scanner/**", "/autoservicio", "/autoservicio/**").permitAll()
+                .requestMatchers("/view/usuarios/**", "/view/agentes/**", "/view/rol/**", "/view/historial/**").hasRole("ADMINISTRADOR")
                 .requestMatchers("/view/**", "/dashboard", "/").hasAnyRole("ADMINISTRADOR", "VIGILANTE")
                 .requestMatchers("/api/**").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated()
